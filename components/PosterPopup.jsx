@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const POSTER_SRC = '/assets/hiring-poster.png';
+const POSTER_SRC = '/assets/hiring-poster.jpeg';
 
 export default function PosterPopup() {
   const dialogRef = useRef(null);
