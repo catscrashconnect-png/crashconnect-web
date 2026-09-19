@@ -10,7 +10,6 @@ import Dashboard from '@/components/Dashboard';
 import Vehicles from '@/components/Vehicles';
 import Compare from '@/components/Compare';
 import Testimonials from '@/components/Testimonials';
-import Roadmap from '@/components/Roadmap';
 import Hiring from '@/components/Hiring';
 import Collab from '@/components/Collab';
 import Contact from '@/components/Contact';
@@ -34,7 +33,6 @@ export default function Home() {
         <Vehicles />
         <Compare />
         <Testimonials />
-        <Roadmap />
         <Hiring />
         <Collab />
         <Contact />
