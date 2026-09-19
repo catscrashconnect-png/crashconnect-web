@@ -5,9 +5,9 @@ import MagneticButton from './MagneticButton';
 
 export default function Hero() {
   return (
-    <section id="top" className="relative flex h-[100svh] w-full items-end">
+    <section id="top" className="relative flex min-h-[100svh] w-full items-end">
       <div className="absolute inset-0 gradient-veil" />
-      <div className="relative z-10 w-full section-pad pb-20 md:pb-28">
+      <div className="relative z-10 w-full section-pad pt-28 pb-20 md:pt-32 md:pb-16 lg:pb-20">
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -20,7 +20,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-4xl text-balance text-[13vw] font-semibold leading-[0.92] tracking-tightest text-soft md:text-[7.5vw]"
+          className="max-w-4xl text-balance text-[13vw] font-semibold leading-[0.92] tracking-tightest text-soft md:text-[clamp(3.5rem,7vw,6rem)] md:leading-[1]"
         >
           The moment
           <br />
