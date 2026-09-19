@@ -2,12 +2,12 @@ import Reveal from './Reveal';
 import MagneticButton from './MagneticButton';
 
 const ROLES = [
-  ['IoT Development', 'Hardware + Software'],
-  ['Embedded Systems Engineering', 'Low-Level Systems'],
-  ['Sensor Integration & Testing', 'Hardware Validation'],
-  ['Low-Level Programming', 'C / C++'],
-  ['Python Development', 'Automation & Logic'],
-  ['AI / ML Engineering', 'Smart Decision Systems'],
+  ['IoT and Embedded Engineer', 'Hardware + Software'],
+  ['PCB Designer', 'Circuit Design'],
+  ['Fullstack Developer', 'Web Development'],
+  ['Python Developer Backend', 'Backend Systems'],
+  ['AI/ML Engineer', 'Smart Decision Systems'],
+  ['Digital Marketing', 'Brand + Growth'],
 ];
 
 export default function Hiring() {
@@ -32,7 +32,7 @@ export default function Hiring() {
       <div className="mt-14 grid gap-3 md:grid-cols-2">
         {ROLES.map(([role, tag]) => (
           <Reveal key={role} y={12}>
-            <div className="flex items-center justify-between rounded-xl border border-line px-6 py-5 transition-colors hover:border-cyan/40">
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-line px-6 py-5 transition-colors hover:border-cyan/40">
               <span className="text-sm">{role}</span>
               <span className="text-[10px] uppercase tracking-[0.15em] text-muted">{tag}</span>
             </div>
