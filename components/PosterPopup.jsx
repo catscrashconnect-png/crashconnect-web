@@ -2,77 +2,116 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const POSTER_SRC = '/assets/hiring-poster.jpeg';
+const POPUP_DELAY_MS = 1000;
+const AUTO_CLOSE_MS = 5000;
 
 export default function PosterPopup() {
-  const dialogRef = useRef(null);
-  const [ready, setReady] = useState(false);
-  const [delayElapsed, setDelayElapsed] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const showTimerRef = useRef(null);
+  const closeTimerRef = useRef(null);
 
   useEffect(() => {
-    // Mounted only after the preloader has fully faded out.
-    const timer = window.setTimeout(() => setDelayElapsed(true), 1000);
-    return () => window.clearTimeout(timer);
-  }, []);
+    const showPopup = () => {
+      if (showTimerRef.current || isOpen) return;
 
-  useEffect(() => {
-    // Start the five seconds only after the poster is ready to display.
-    const image = new Image();
-    image.onload = () => setReady(true);
-    image.src = POSTER_SRC;
-    return () => { image.onload = null; };
-  }, []);
+      showTimerRef.current = window.setTimeout(() => {
+        setIsOpen(true);
+        showTimerRef.current = null;
+      }, POPUP_DELAY_MS);
+    };
 
-  useEffect(() => {
-    if (!ready || !delayElapsed) return;
+    // Preferred path: Preloader dispatches this after its fade-out completes.
+    const handleReady = () => showPopup();
+    window.addEventListener('crashconnect:preloader-finished', handleReady);
 
-    const dialog = dialogRef.current;
-    const previousFocus = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
-    dialog.showModal();
-    document.body.style.overflow = 'hidden';
-
-    function restorePage() {
-      document.body.style.overflow = previousOverflow;
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
-        previousFocus.focus({ preventScroll: true });
-      }
+    // If the preloader has already finished before this component mounted.
+    if (window.__CRASHCONNECT_PRELOADER_FINISHED__) {
+      showPopup();
     }
 
-    const timer = window.setTimeout(() => dialog.close(), 5000);
-    dialog.addEventListener('close', restorePage);
-    return () => {
-      window.clearTimeout(timer);
-      dialog.removeEventListener('close', restorePage);
-      if (dialog.open) dialog.close();
-      restorePage();
+    // Safe fallback: if there is no preloader event for any reason,
+    // wait until the full page load has completed, then show it.
+    let fallbackTimer;
+    const startFallback = () => {
+      fallbackTimer = window.setTimeout(() => {
+        if (!window.__CRASHCONNECT_PRELOADER_FINISHED__) showPopup();
+      }, 5000);
     };
-  }, [ready, delayElapsed]);
+
+    if (document.readyState === 'complete') {
+      startFallback();
+    } else {
+      window.addEventListener('load', startFallback, { once: true });
+    }
+
+    return () => {
+      window.removeEventListener('crashconnect:preloader-finished', handleReady);
+      window.removeEventListener('load', startFallback);
+      if (fallbackTimer) window.clearTimeout(fallbackTimer);
+      if (showTimerRef.current) window.clearTimeout(showTimerRef.current);
+      if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsOpen(false);
+    }, AUTO_CLOSE_MS);
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
 
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label="CrashConnect internship announcement"
-      className="fixed inset-0 z-[70] m-auto max-h-[88dvh] w-max max-w-[94vw] overflow-hidden rounded-xl border border-line bg-bg p-3 text-soft shadow-2xl backdrop:bg-black/80 md:max-w-[90vw]"
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-3 backdrop-blur-[2px] sm:p-5"
+      role="dialog"
+      aria-modal="true"
+      aria-label="CrashConnect hiring poster"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) setIsOpen(false);
+      }}
     >
-      <div className="mb-3 flex justify-end">
+      <div className="relative flex max-h-[96dvh] max-w-[96vw] items-center justify-center pt-11 sm:pt-12">
         <button
           type="button"
-          autoFocus
-          onClick={() => dialogRef.current.close()}
-          className="min-h-11 rounded-full border border-lineStrong px-4 text-sm hover:border-cyan focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan"
-          aria-label="Close poster"
+          onClick={() => setIsOpen(false)}
+          className="absolute right-0 top-0 z-10 rounded-full border border-cyan/70 bg-bg/95 px-4 py-2 text-sm font-medium text-white shadow-xl transition hover:border-cyan hover:bg-bg focus:outline-none focus:ring-2 focus:ring-cyan"
+          aria-label="Close hiring poster"
         >
           Close ×
         </button>
-      </div>
-      {ready && (
+
         <img
-          src={POSTER_SRC}
-          alt="Crash Connect is hiring interns in PCB design, IoT and embedded hardware, and full-stack development. Work from home, unpaid internship, certificate provided, Trichy candidates preferred. Apply at catscrashconnect@gmail.com or call 8680021912."
-          className="block h-auto max-h-[calc(88dvh-5.125rem)] w-auto max-w-[calc(94vw-1.625rem)] object-contain md:max-w-[calc(90vw-1.625rem)]"
+          src="/assets/hiring-poster-web.webp"
+          alt="Crash Connect Private Limited hiring interns poster"
+          width="1280"
+          height="1920"
+          className="block h-auto w-auto max-h-[86dvh] max-w-[94vw] rounded-xl object-contain shadow-2xl sm:max-w-[90vw]"
+          loading="eager"
+          decoding="async"
         />
-      )}
-    </dialog>
+      </div>
+    </div>
   );
 }
