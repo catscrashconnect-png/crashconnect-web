@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { subscribeProgress } from '@/lib/frameStore';
+import PosterPopup from './PosterPopup';
 
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
+  const [siteVisible, setSiteVisible] = useState(false);
 
   useEffect(() => {
     const unsub = subscribeProgress((loaded, total) => {
@@ -30,7 +32,8 @@ export default function Preloader() {
   }, [progress]);
 
   return (
-    <AnimatePresence>
+    <>
+    <AnimatePresence onExitComplete={() => setSiteVisible(true)}>
       {!done && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center bg-bg"
@@ -60,5 +63,7 @@ export default function Preloader() {
         </motion.div>
       )}
     </AnimatePresence>
+    {siteVisible && <PosterPopup />}
+    </>
   );
 }
