@@ -4,7 +4,7 @@ import MagneticButton from './MagneticButton';
 const ROLES = [
   ['IoT and Embedded Engineer', 'Hardware + Software'],
   ['PCB Designer', 'Circuit Design'],
-  ['Fullstack Developer', 'App & Web Development'],
+  ['Fullstack Developer', 'App + Web Development'],
   ['Python Developer Backend', 'Backend Systems'],
   ['AI/ML Engineer', 'Smart Decision Systems'],
   ['Digital Marketing', 'Brand + Growth'],
