@@ -10,7 +10,6 @@ export default function Footer() {
           <a href="#technology" className="hover:text-soft">Technology</a>
           <a href="#features" className="hover:text-soft">Features</a>
           <a href="#vehicles" className="hover:text-soft">Vehicles</a>
-          <a href="#roadmap" className="hover:text-soft">Roadmap</a>
           <a href="#careers" className="hover:text-soft">Careers</a>
           <a href="#contact" className="hover:text-soft">Contact</a>
         </nav>
